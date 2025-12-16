@@ -1,6 +1,6 @@
 # OviSoft PHP MVC Framework
 
-![Versión](https://img.shields.io/badge/versión-1.2.0-blue)
+![Versión](https://img.shields.io/badge/versión-1.3.0-blue)
 ![PHP](https://img.shields.io/badge/PHP-%3E%3D7.4-777BB4?logo=php&logoColor=white)
 ![Licencia](https://img.shields.io/badge/licencia-MIT-green)
 
@@ -11,8 +11,11 @@ Un framework MVC ligero y moderno para PHP con tipado estricto, diseñado para c
 - ✅ **Arquitectura MVC** - Separación clara de responsabilidades
 - ✅ **Tipado Estricto** - Uso de `declare(strict_types=1)` en todos los archivos
 - ✅ **Routing Amigable** - URLs limpias mediante `.htaccess`
+- ✅ **Rutas Personalizadas** - Sistema de alias para URLs más amigables (v1.3.0)
+- ✅ **Controladores en Subdirectorios** - Organiza tu código en subcarpetas (v1.3.0)
 - ✅ **Autoloading** - Carga automática de clases del core
 - ✅ **Sistema de Vistas Flexible** - Manejo automático de rutas de vistas
+- ✅ **Template Admin** - Sistema de componentes reutilizables para áreas de administración (v1.3.0)
 - ✅ **Manejo de Errores** - Sistema integrado de páginas de error
 - ✅ **Estructura Modular** - Fácil de extender y mantener
 
@@ -171,6 +174,119 @@ http://localhost/?url=controlador/metodo/parametros
 - `?url=home/home` → Controlador: `Home`, Método: `home()`
 - `?url=products/show/123` → Controlador: `Products`, Método: `show("123")`
 - `?url=users/edit/5,admin` → Controlador: `Users`, Método: `edit("5,admin")`
+
+### 🆕 Controladores en Subdirectorios (v1.3.0)
+
+Ahora puedes organizar tus controladores en subdirectorios para mejor estructura:
+
+```
+controllers/
+├── home.controller.php
+├── error.controller.php
+└── admin/
+    ├── dashboard.controller.php
+    ├── users.controller.php
+    └── settings.controller.php
+```
+
+**Acceso mediante URL:**
+
+- `?url=admin/dashboard/index` → `controllers/admin/dashboard.controller.php`
+- `?url=admin/users/edit/5` → `controllers/admin/users.controller.php`
+
+**Ejemplo de controlador en subdirectorio:**
+
+```php
+<?php
+// controllers/admin/dashboard.controller.php
+
+declare(strict_types=1);
+
+class Dashboard extends Controllers
+{
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    public function index(string $params = ""): void
+    {
+        $data['title'] = 'Dashboard Admin';
+        $this->views->getView($this, "admin/dashboard/index", $data);
+    }
+}
+```
+
+### 🆕 Rutas Personalizadas (v1.3.0)
+
+Define URLs amigables en `config/routes.php`:
+
+```php
+<?php
+// config/routes.php
+
+return [
+    'dashboard' => 'admin/dashboard/index',
+    'usuarios' => 'admin/users/index',
+    'perfil' => 'user/profile/index',
+];
+```
+
+**Ahora puedes usar URLs más cortas:**
+
+- `?url=dashboard` en lugar de `?url=admin/dashboard/index`
+- `?url=usuarios` en lugar de `?url=admin/users/index`
+- `?url=perfil` en lugar de `?url=user/profile/index`
+
+### 🆕 Helper para Templates Admin (v1.3.0)
+
+Carga componentes del template admin de forma sencilla con `getAdminTemplate()`:
+
+**Estructura de template:**
+
+```
+views/admin/template/
+├── header.php       # Meta tags, CSS, fuentes
+├── nav.php          # Sidebar principal
+├── nav_mobile.php   # Menú móvil (offcanvas)
+├── top_bar.php      # Barra superior
+├── footer.php       # Footer
+└── scripts.php      # Scripts JS
+```
+
+**Uso en vistas:**
+
+```php
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <?php getAdminTemplate('header', $data); ?>
+</head>
+<body>
+    <!-- Sidebar -->
+    <?php getAdminTemplate('nav'); ?>
+    
+    <!-- Menú móvil -->
+    <?php getAdminTemplate('nav_mobile'); ?>
+    
+    <div class="main-wrapper">
+        <!-- Barra superior -->
+        <?php getAdminTemplate('top_bar'); ?>
+        
+        <!-- Tu contenido aquí -->
+        <main class="main-content">
+            <h1><?php echo $data['title']; ?></h1>
+        </main>
+        
+        <!-- Footer -->
+        <?php getAdminTemplate('footer'); ?>
+    </div>
+    
+    <!-- Scripts -->
+    <?php getAdminTemplate('scripts'); ?>
+</body>
+</html>
+```
 
 ## 🎯 Características Técnicas
 
