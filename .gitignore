@@ -1,0 +1,68 @@
+# Ignorar archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar guías personales de desarrollo
+GITHUB_SETUP.md
+
+# Ignorar archivos de IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignorar archivos de configuración local
+config/config.php
+config/database.php
+config/local.php
+
+# Ignorar logs
+*.log
+logs/
+
+# Ignorar archivos temporales
+tmp/
+temp/
+cache/
+
+# Ignorar dependencias (si usas Composer en el futuro)
+vendor/
+composer.lock
+
+# Ignorar archivos de entorno
+.env
+.env.local
+
+# Ignorar uploads de usuarios
+uploads/*
+!uploads/.gitkeep
+
+# Ignorar imágenes subidas por usuarios
+assets/images/uploads/*
+!assets/images/uploads/.gitkeep
+
+# ============================================================
+# CONTENIDO DEL SITIO (NO SUBIR AL FRAMEWORK)
+# ============================================================
+
+# Ignorar vista home (contenido del sitio público)
+views/home.php
+
+# Ignorar controlador home (contenido del sitio público)
+controllers/home.controller.php
+
+# Ignorar modelo home (contenido del sitio público)
+models/homeModel.php
+
+# Ignorar assets del sitio público (imágenes, videos, etc.)
+assets/image/*
+assets/video/*
+assets/css/styles.css
+assets/css/animations.css
+assets/js/main.js
+
+# Mantener solo archivos del framework y admin
+!assets/image/icon.svg
+!assets/image/avatar.svg
+!assets/css/admin/
+!assets/js/admin/

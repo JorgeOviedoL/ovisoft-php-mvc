@@ -1,0 +1,18 @@
+Options All -Indexes
+# Asegura que .json se sirva como JSON
+<IfModule mod_mime.c>
+  AddType application/json .json
+</IfModule>
+
+# Fuerza el header correcto para .json
+<IfModule mod_headers.c>
+  <FilesMatch "\.json$">
+    Header set Content-Type "application/json; charset=utf-8"
+  </FilesMatch>
+</IfModule>
+
+RewriteEngine on 
+
+RewriteCond %{REQUEST_FILENAME} !-d 
+RewriteCond %{REQUEST_FILENAME} !-f 
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
