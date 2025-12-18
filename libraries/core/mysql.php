@@ -75,20 +75,28 @@ class Mysql extends Connection
      * 
      * Ejecuta una query SELECT y retorna el primer resultado como array asociativo.
      * Útil para buscar un registro específico por ID u otro criterio único.
+     * Soporta prepared statements opcionales para mayor seguridad.
      *
-     * @param string $query Query SQL SELECT
+     * @param string $query Query SQL SELECT (puede incluir placeholders ?)
+     * @param array $arrValues Valores opcionales para prepared statements
      * @return array|false Array asociativo con los datos del registro, false si no existe
      * 
      * @example
-     * $query = "SELECT * FROM users WHERE id = 1";
+     * // Sin prepared statement
+     * $query = "SELECT * FROM users WHERE active = 1";
      * $user = $this->select($query);
+     * 
+     * // Con prepared statement (recomendado)
+     * $query = "SELECT * FROM users WHERE id = ?";
+     * $user = $this->select($query, [1]);
      */
-    public function select(string $query): array|false
+    public function select(string $query, array $arrValues = []): array|false
     {
         $this->strquery = $query;
+        $this->arrValues = $arrValues;
 
         $result = $this->connection->prepare($this->strquery);
-        $result->execute();
+        $result->execute($this->arrValues);
         $data = $result->fetch(\PDO::FETCH_ASSOC);
 
         return $data;
@@ -99,20 +107,28 @@ class Mysql extends Connection
      * 
      * Ejecuta una query SELECT y retorna todos los resultados como array de arrays asociativos.
      * Útil para listar múltiples registros.
+     * Soporta prepared statements opcionales para mayor seguridad.
      *
-     * @param string $query Query SQL SELECT
+     * @param string $query Query SQL SELECT (puede incluir placeholders ?)
+     * @param array $arrValues Valores opcionales para prepared statements
      * @return array Array de arrays asociativos con los datos de los registros
      * 
      * @example
+     * // Sin prepared statement
      * $query = "SELECT * FROM users WHERE active = 1";
      * $users = $this->select_all($query);
+     * 
+     * // Con prepared statement (recomendado)
+     * $query = "SELECT * FROM users WHERE status = ?";
+     * $users = $this->select_all($query, [1]);
      */
-    public function select_all(string $query): array
+    public function select_all(string $query, array $arrValues = []): array
     {
         $this->strquery = $query;
+        $this->arrValues = $arrValues;
 
         $result = $this->connection->prepare($this->strquery);
-        $result->execute();
+        $result->execute($this->arrValues);
         $data = $result->fetchAll(\PDO::FETCH_ASSOC);
 
         return $data;

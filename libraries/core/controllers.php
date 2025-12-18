@@ -53,4 +53,37 @@ class Controllers
             $this->model = new $model();
         }
     }
+
+    /**
+     * Carga un modelo específico por nombre
+     * 
+     * Permite cargar cualquier modelo desde cualquier controlador.
+     * Útil cuando necesitas usar un modelo diferente al del controlador actual.
+     * 
+     * @param string $modelName Nombre del modelo sin el sufijo "Model" (ej: 'Roles', 'Users')
+     * @return object Instancia del modelo solicitado
+     * @throws Exception Si el modelo no existe
+     * 
+     * @example
+     * // En UsersController, cargar RolesModel
+     * $rolesModel = $this->getModel('Roles');
+     * $roles = $rolesModel->selectRoles();
+     */
+    protected function getModel(string $modelName): object
+    {
+        $modelClass = $modelName . "Model";
+        $modelFile = "models/{$modelClass}.php";
+
+        if (!file_exists($modelFile)) {
+            throw new Exception("Model not found: {$modelClass} at {$modelFile}");
+        }
+
+        require_once $modelFile;
+
+        if (!class_exists($modelClass)) {
+            throw new Exception("Class {$modelClass} not found in file {$modelFile}");
+        }
+
+        return new $modelClass();
+    }
 }

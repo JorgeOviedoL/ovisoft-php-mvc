@@ -108,6 +108,116 @@ function getAdminTemplate(string $view, array $data = []): void
 }
 
 /**
+ * Carga modales de la aplicación
+ * 
+ * Función genérica que carga cualquier modal desde la carpeta views/modals.
+ * Busca el archivo en views/modals/{$nameModal}.php y lo incluye en la vista.
+ * Esta función permite centralizar la carga de modales y mantener un código más limpio.
+ * 
+ * IMPORTANTE: Esta función debe llamarse ANTES de la etiqueta <body> o dentro del <head>
+ * para que el modal esté disponible en el DOM cuando se necesite abrir.
+ * 
+ * @param string $nameModal Nombre del archivo modal a cargar (sin extensión .php)
+ * @param array $data Datos opcionales a pasar al modal (disponibles como variables)
+ * @return void
+ * 
+ * @example
+ * // Cargar modal de roles en la vista
+ * getModal('modalRoles');
+ * 
+ * // Cargar modal con datos
+ * getModal('modalUsers', ['title' => 'Nuevo Usuario']);
+ * 
+ * // Cargar múltiples modales
+ * getModal('modalRoles');
+ * getModal('modalPermissions');
+ * 
+ * // Uso típico en una vista (roles.php)
+ * <?php
+ * getAdminTemplate('header', $data);
+ * getModal('modalRoles', $data);  // ← Cargar modal antes del body
+ * ?>
+ * <body>
+ *     <!-- Contenido de la página -->
+ *     <button onclick="openModal()">Abrir Modal</button>
+ * </body>
+ * 
+ * @throws void Termina la ejecución con die() si el modal no existe
+ * 
+ * @see getAdminTemplate() Función similar para cargar componentes del template admin
+ */
+function getModal(string $nameModal, array $data = []): void
+{
+    $view_modal = "views/modals/{$nameModal}.php";
+
+    if (file_exists($view_modal)) {
+        require_once $view_modal;
+    } else {
+        die("Error: Modal no encontrado - {$view_modal}");
+    }
+}
+
+/**
+ * Determina si un elemento del menú debe estar activo
+ * 
+ * Compara la URL actual con la URL del elemento del menú para determinar
+ * si debe tener la clase 'active'. Útil para resaltar la sección actual
+ * en la navegación.
+ * 
+ * @param string $menuUrl URL del elemento del menú (relativa, sin base_url)
+ * @return string Retorna 'active' si la URL coincide, string vacío si no
+ * 
+ * @example
+ * // En el menú:
+ * <a href="<?php echo base_url(); ?>roles" class="nav-link <?php echo isActiveMenu('admin/roles'); ?>">
+ * 
+ * // Si la URL actual es /admin/roles, retorna 'active'
+ * // Si la URL actual es /dashboard, retorna ''
+ */
+function isActiveMenu(string $menuUrl): string
+{
+    // Obtener la URL actual desde $_GET
+    $currentUrl = !empty($_GET['url']) ? $_GET['url'] : 'home/home';
+
+    // Limpiar las URLs para comparación
+    $currentUrl = trim($currentUrl, '/');
+    $menuUrl = trim($menuUrl, '/');
+
+    // Comparar si la URL actual comienza con la URL del menú
+    // Esto permite que /admin/roles active el menú de /admin/roles
+    if (strpos($currentUrl, $menuUrl) === 0) {
+        return 'active';
+    }
+
+    return '';
+}
+
+/**
+ * Determina si un menú padre debe estar activo
+ * 
+ * Verifica si alguna de las URLs hijas está activa para marcar el menú padre.
+ * Útil para menús colapsables que contienen submenús.
+ * 
+ * @param array $childUrls Array de URLs de los elementos hijos
+ * @return string Retorna 'active' si algún hijo está activo, string vacío si no
+ * 
+ * @example
+ * // En el menú padre:
+ * <a href="#" class="nav-link <?php echo isActiveParentMenu(['admin/roles', 'admin/users']); ?>">
+ * 
+ * // Si la URL actual es /admin/roles, retorna 'active'
+ */
+function isActiveParentMenu(array $childUrls): string
+{
+    foreach ($childUrls as $childUrl) {
+        if (isActiveMenu($childUrl) === 'active') {
+            return 'active';
+        }
+    }
+    return '';
+}
+
+/**
  * Muestra el contenido de un array de forma legible (Debug)
  * 
  * Imprime un array con formato HTML <pre> para facilitar la depuración.
@@ -125,6 +235,7 @@ function dep(array $data): void
     print_r($data);
     echo '</pre>';
 }
+
 
 /**
  * Limpia y sanitiza una cadena de texto
